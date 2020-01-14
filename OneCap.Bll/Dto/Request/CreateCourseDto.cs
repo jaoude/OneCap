@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace OneCap.Dal.Entities
+namespace OneCap.Bll.Dto.Request
 {
-    [Table("Course")]
-    public class Course
+    public class CreateCourseDto
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
-        [MaxLength(Common.Constants.MAX_LEN_NAME)]
+        [MaxLength(Common.Constants.MAX_LEN_NAME), MinLength(Common.Constants.MIN_LEN_NAME)]
         public string Name { get; set; }
 
         [Required]

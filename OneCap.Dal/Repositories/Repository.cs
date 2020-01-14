@@ -35,7 +35,7 @@ namespace OneCap.Dal.Repositories
 
         public virtual async Task<T> GetAsync(int id, CancellationToken ct)
         {
-            return await _db.Set<T>().FindAsync(id, ct);
+            return await _db.Set<T>().FindAsync(new object[] { id }, ct);
         }
 
         public virtual T Add(T t)

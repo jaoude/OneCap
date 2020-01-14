@@ -22,8 +22,6 @@ namespace OneCap.Dal.Context
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
             // seed the database with dummy data
-
-            builder.Entity<Course>().Property(x => x.Id).HasDefaultValueSql("NEWID()");
         }
     }
 }

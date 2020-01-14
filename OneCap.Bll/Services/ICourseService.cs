@@ -1,4 +1,6 @@
-﻿using OneCap.Bll.Dto.Result;
+﻿using OneCap.Bll.Dto.Request;
+using OneCap.Bll.Dto.Result;
+using OneCap.Dal.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +11,8 @@ namespace OneCap.Bll.Services
 {
     public interface ICourseService : IServiceBase
     {
-        Task<CourseDto> GetCourseByIdAsync(Guid id, CancellationToken ct);
-        Task<List<CourseDto>> GetCoursesAsync(CancellationToken ct);
+        Task<CourseDto> GetCourseByIdAsync(int id, CancellationToken ct);
+        Task<IEnumerable<CourseDto>> GetCoursesAsync(CancellationToken ct);
+        Task<CourseDto> CreateCourseAsync(CreateCourseDto creatCourseDto, CancellationToken ct);
     }
 }

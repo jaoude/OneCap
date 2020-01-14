@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using OneCap.Bll.Dto.Request;
 using OneCap.Bll.Services;
 
 namespace OneCap.Api.Controllers
@@ -23,8 +24,8 @@ namespace OneCap.Api.Controllers
             _courseService = courseService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetCourse(Guid id, CancellationToken ct)
+        [HttpGet("{id}", Name = "GetCourse")]
+        public async Task<ActionResult> GetCourse(int id, CancellationToken ct)
         {
             var courseDto = await _courseService.GetCourseByIdAsync(id, ct);
             
@@ -34,6 +35,7 @@ namespace OneCap.Api.Controllers
             return Ok(courseDto);
         }
 
+        [HttpGet()]
         public async Task<ActionResult> GetCourses(CancellationToken ct)
         {
             var coursesDto = await _courseService.GetCoursesAsync(ct);
@@ -41,6 +43,21 @@ namespace OneCap.Api.Controllers
                 return NotFound();
 
             return Ok(coursesDto);
+        }
+
+        [HttpPost()]
+        public async Task<ActionResult> GetCourses([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
+        {
+            if (createCourseDto == null)
+                return BadRequest();
+
+            var courseToReturn = await _courseService.CreateCourseAsync(createCourseDto, ct);
+
+            if (courseToReturn == null)
+                throw new Exception("Creating a course failed on save.");
+
+
+            return CreatedAtRoute("GetCourse", new { id = courseToReturn.Id }, courseToReturn);
         }
     }
 }

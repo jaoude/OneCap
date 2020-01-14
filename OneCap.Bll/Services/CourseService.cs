@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using OneCap.Bll.Dto.Request;
 using OneCap.Bll.Dto.Result;
 using OneCap.Dal.Entities;
 using OneCap.Dal.UnitOfWork;
@@ -17,9 +18,9 @@ namespace OneCap.Bll.Services
         { 
         }
 
-        public async Task<CourseDto> GetCourseByIdAsync(Guid id, CancellationToken ct)
+        public async Task<CourseDto> GetCourseByIdAsync(int id, CancellationToken ct)
         {
-            Course courseEntity = await _uow.Courses.GetEntityByIdAsync(ct, id);
+            Course courseEntity = await _uow.Courses.GetAsync(id, ct);
             if (courseEntity == null)
                 return null;
 
@@ -28,15 +29,34 @@ namespace OneCap.Bll.Services
             return courseDto;
         }
 
-        public async Task<List<CourseDto>> GetCouresAsync(CancellationToken ct)
+        public async Task<IEnumerable<CourseDto>> GetCoursesAsync(CancellationToken ct)
         {
-            var courseEntities = await _uow.Courses.GetCoursesAsync(ct, id);
+            var courseEntities = await _uow.Courses.GetAllAsync(ct);
             if (courseEntities == null)
                 return null;
 
-            var coursesDto = _mapper.Map<CourseDto>(courseEntities);
+            var coursesDto = _mapper.Map<IEnumerable<CourseDto>>(courseEntities);
 
             return coursesDto;
+        }
+
+        public async Task<CourseDto> CreateCourseAsync(CreateCourseDto createCourseDto, CancellationToken ct)
+        {
+            Course courseEntity = null;
+            
+            try
+            {
+                courseEntity = _mapper.Map<Course>(createCourseDto);
+
+                await _uow.Courses.AddAsync(courseEntity, ct);
+                await _uow.SaveChangesAsync(ct);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+            return _mapper.Map<CourseDto>(courseEntity); ;
         }
     }
 }

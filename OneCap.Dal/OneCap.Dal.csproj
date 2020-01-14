@@ -13,4 +13,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OneCap.Common\OneCap.Common.csproj" />
+  </ItemGroup>
+
 </Project>

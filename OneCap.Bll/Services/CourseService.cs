@@ -19,13 +19,24 @@ namespace OneCap.Bll.Services
 
         public async Task<CourseDto> GetCourseByIdAsync(Guid id, CancellationToken ct)
         {
-            Course courseEntity = await _uow.Courses.GetCourseByIdAsync(ct, id);
+            Course courseEntity = await _uow.Courses.GetEntityByIdAsync(ct, id);
             if (courseEntity == null)
                 return null;
 
             CourseDto courseDto = _mapper.Map<CourseDto>(courseEntity);
 
             return courseDto;
+        }
+
+        public async Task<List<CourseDto>> GetCouresAsync(CancellationToken ct)
+        {
+            var courseEntities = await _uow.Courses.GetCoursesAsync(ct, id);
+            if (courseEntities == null)
+                return null;
+
+            var coursesDto = _mapper.Map<CourseDto>(courseEntities);
+
+            return coursesDto;
         }
     }
 }

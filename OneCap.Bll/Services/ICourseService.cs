@@ -10,5 +10,6 @@ namespace OneCap.Bll.Services
     public interface ICourseService : IServiceBase
     {
         Task<CourseDto> GetCourseByIdAsync(Guid id, CancellationToken ct);
+        Task<List<CourseDto>> GetCoursesAsync(CancellationToken ct);
     }
 }

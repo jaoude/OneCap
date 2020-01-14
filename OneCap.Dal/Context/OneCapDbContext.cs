@@ -10,6 +10,7 @@ namespace OneCap.Dal.Context
     public class OneCapDbContext : DbContext
     {
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Student> Students { get; set; }
 
         public OneCapDbContext(DbContextOptions<OneCapDbContext> options) : base(options)
         {

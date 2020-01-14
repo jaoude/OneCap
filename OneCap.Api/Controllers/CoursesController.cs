@@ -33,5 +33,14 @@ namespace OneCap.Api.Controllers
             
             return Ok(courseDto);
         }
+
+        public async Task<ActionResult> GetCourses(CancellationToken ct)
+        {
+            var coursesDto = await _courseService.GetCoursesAsync(ct);
+            if (coursesDto == null)
+                return NotFound();
+
+            return Ok(coursesDto);
+        }
     }
 }

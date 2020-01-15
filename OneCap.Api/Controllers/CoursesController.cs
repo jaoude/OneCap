@@ -35,7 +35,7 @@ namespace OneCap.Api.Controllers
             return Ok(courseDto);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<ActionResult> GetCourses(CancellationToken ct)
         {
             var coursesDto = await _courseService.GetCoursesAsync(ct);
@@ -45,7 +45,7 @@ namespace OneCap.Api.Controllers
             return Ok(coursesDto);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public async Task<ActionResult> GetCourses([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
         {
             if (createCourseDto == null)

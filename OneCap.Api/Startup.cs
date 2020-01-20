@@ -17,6 +17,7 @@ using OneCap.Dal.Repositories;
 using OneCap.Bll.Services;
 using AutoMapper;
 using OneCap.Bll.Helpers;
+using Microsoft.AspNetCore.Identity;
 
 namespace OneCap.Api
 {
@@ -35,6 +36,9 @@ namespace OneCap.Api
             services.AddDbContextPool<OneCapDbContext>(
                 option => option.UseSqlServer(Configuration.GetConnectionString("OneCapConnectionString")
             ));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<OneCapDbContext>();
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ICourseRepository, CourseRepository>();
@@ -66,7 +70,7 @@ namespace OneCap.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

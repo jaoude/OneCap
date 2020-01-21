@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OneCap.Bll.Dto.Request;
@@ -46,6 +47,7 @@ namespace OneCap.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> GetCourses([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
         {
             if (createCourseDto == null)

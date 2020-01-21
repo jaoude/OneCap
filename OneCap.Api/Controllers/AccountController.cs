@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using OneCap.Bll.Dto.Request;
 using OneCap.Bll.Dto.Request.Account;
 using OneCap.Bll.Services;
+using OneCap.Dal.Entities;
 
 namespace OneCap.Api.Controllers
 {
@@ -17,11 +18,11 @@ namespace OneCap.Api.Controllers
     [Route("api/account")]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ILogger<AccountController> logger)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -30,10 +31,10 @@ namespace OneCap.Api.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto registerUser, CancellationToken ct)
+        public async Task<IActionResult> Register([FromBody] RegisterUserDto model, CancellationToken ct)
         {
-            var user = new IdentityUser { UserName = registerUser.Email, Email = registerUser.Email };
-            var result = await _userManager.CreateAsync(user, registerUser.Password);
+            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
@@ -42,6 +43,26 @@ namespace OneCap.Api.Controllers
             }
 
             return BadRequest(result.Errors);
+        }
+
+        [HttpPost]
+        [Route("logout")]
+        public async Task<IActionResult> Logout(CancellationToken ct)
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] LoginUserDto model, CancellationToken ct)
+        {
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+            if (result.Succeeded)
+                return Ok();
+            
+            return BadRequest(result);
         }
     }
 }

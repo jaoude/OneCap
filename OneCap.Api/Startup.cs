@@ -18,6 +18,7 @@ using OneCap.Bll.Services;
 using AutoMapper;
 using OneCap.Bll.Helpers;
 using Microsoft.AspNetCore.Identity;
+using OneCap.Dal.Entities;
 
 namespace OneCap.Api
 {
@@ -37,7 +38,7 @@ namespace OneCap.Api
                 option => option.UseSqlServer(Configuration.GetConnectionString("OneCapConnectionString")
             ));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<OneCapDbContext>();
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();

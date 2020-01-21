@@ -5,7 +5,7 @@ using OneCap.Dal.Entities;
 
 namespace OneCap.Dal.Context
 {
-    public class OneCapDbContext : IdentityDbContext
+    public class OneCapDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Course> Courses { get; set; }
         public DbSet<Student> Students { get; set; }

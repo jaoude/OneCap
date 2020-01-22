@@ -45,6 +45,7 @@ namespace OneCap.Api
             services.AddTransient<ICourseRepository, CourseRepository>();
 
             services.AddTransient<IServiceBase, ServiceBase>();
+            services.AddTransient<IAdministrationService, AdministrationService>();
             services.AddTransient<ICourseService, CourseService>();
 
             // Auto Mapper Configurations

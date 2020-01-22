@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using OneCap.Bll.Dto.Request;
 using OneCap.Bll.Dto.Result;
 using OneCap.Dal.Entities;
@@ -9,8 +10,11 @@ namespace OneCap.Bll.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<Course, CourseDto>();
+            CreateMap<Course, RoleDto>();
             CreateMap<CreateCourseDto, Course>();
+
+            CreateMap<CreateRoleDto, IdentityRole>();
+            CreateMap<IdentityRole, RoleDto>();
         }
     }
 }

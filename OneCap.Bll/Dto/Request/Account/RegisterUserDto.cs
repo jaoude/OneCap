@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace OneCap.Bll.Dto.Request.Account
+namespace OneCap.Bll.Dto.Request
 {
     public class RegisterUserDto
     {

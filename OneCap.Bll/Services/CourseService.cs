@@ -56,7 +56,7 @@ namespace OneCap.Bll.Services
                 return null;
             }
 
-            return _mapper.Map<CourseDto>(courseEntity); ;
+            return _mapper.Map<CourseDto>(courseEntity);
         }
     }
 }

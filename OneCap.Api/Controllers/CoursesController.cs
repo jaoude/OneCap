@@ -48,7 +48,7 @@ namespace OneCap.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> GetCourses([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
+        public async Task<ActionResult> CreateCourse([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
         {
             if (createCourseDto == null)
                 return BadRequest();

@@ -7,6 +7,7 @@ using OneCap.Bll.Models;
 using OneCap.Bll.Services;
 using OneCap.Dal.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -33,8 +34,7 @@ namespace OneCap.Api.Controllers
             _roleManager = roleManager;
         }
 
-        [HttpPost]
-        [Route("roles")]
+        [HttpPost("roles")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleDto model, CancellationToken ct)
         {
             RoleDto roleToRetun = null;
@@ -43,12 +43,11 @@ namespace OneCap.Api.Controllers
             if (result.Succeeded)
                 return CreatedAtRoute("GetRole", new { id = roleToRetun.Id }, roleToRetun);
 
-            return BadRequest(result.Errors); 
+            return BadRequest(result.Errors);
         }
 
-        [HttpGet("{id}", Name = "GetRole")]
-        [Route("roles")]
-        public async Task<IActionResult> GetRole(string id, CancellationToken ct)
+        [HttpGet("roles/{id}", Name = "GetRole")]
+        public async Task<IActionResult> GetRoleById([FromRoute]string id, CancellationToken ct)
         {
             var Role = await _administrationService.GetRoleAsync(id, ct);
 
@@ -58,8 +57,7 @@ namespace OneCap.Api.Controllers
             return Ok(Role);
         }
 
-        [HttpGet]
-        [Route("roles")]
+        [HttpGet("roles")]
         public  IActionResult GetRoles(CancellationToken ct)
         {
             var Roles = _administrationService.GetRoles(ct);
@@ -70,39 +68,51 @@ namespace OneCap.Api.Controllers
             return Ok(Roles);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ManageUserClaims(string userId, CancellationToken ct)
+        [HttpPost("userclaims")]
+        public async Task<IActionResult> ManageUserClaims([FromBody] UserClaimsDto model, CancellationToken ct)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(model.UserId);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            var existingUserClaims = await _userManager.GetClaimsAsync(user);
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+            var result = await _userManager.RemoveClaimsAsync(user, existingClaims);
 
-            var model = new UserClaimsDto()
+            if (!result.Succeeded)
+                return BadRequest(); // TDOD Bad request is not the best returned error 
+
+            var claims = model.Claims.Select(c => new Claim(c.ClaimType, c.ClaimType));
+
+            result = await _userManager.AddClaimsAsync(user, claims);
+            if (!result.Succeeded)
+                return BadRequest(); // TDOD Bad request is not the best returned error 
+
+            return CreatedAtRoute("GetUserClaims", new { id = model.UserId }, model);
+        }
+
+        [HttpGet("userclaims/{id}", Name = "GetUserClaims")]
+        public async Task<IActionResult> GetUserClaims([FromRoute]string id, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
             {
-                UserId = userId
-            };
-
-            foreach (Claim claim in ClaimStore.AllClaims)
-            {
-                UserClaimDto userClaim = new UserClaimDto()
-                {
-                    ClaimType = claim.Type
-                };
-
-                if (existingUserClaims.Any(c => c.Type == claim.Type))
-                {
-                    userClaim.IsSelected = true;
-                }
-
-                model.Claims.Add(userClaim);
+                return NotFound();
             }
 
-            return Ok(model);
+            var existingClaims = await _userManager.GetClaimsAsync(user);
+            var claims = existingClaims.Select(c => new UserClaimDto() { ClaimType = c.Type, IsSelected = true });
+
+            var result = new UserClaimsDto()
+            {
+                UserId = id,
+                Claims = claims.ToList()
+            };
+
+            return Ok(result);
         }
     }
 }

@@ -16,6 +16,6 @@ namespace OneCap.Bll.Services
 
         Task<RoleDto> GetRoleAsync(string id, CancellationToken ct);
 
-        List<RoleDto> GetRolesAsync(CancellationToken ct);
+        List<RoleDto> GetRoles(CancellationToken ct);
     }
 }

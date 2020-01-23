@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OneCap.Bll.Dto.Request;
 using OneCap.Bll.Dto.Result;
+using OneCap.Bll.Models;
 using OneCap.Bll.Services;
+using OneCap.Dal.Entities;
 using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,11 +20,17 @@ namespace OneCap.Api.Controllers
     {
         private readonly ILogger<AdministrationController> _logger;
         private readonly IAdministrationService _administrationService;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdministrationController(ILogger<AdministrationController> logger, IAdministrationService administrationService)
+        public AdministrationController(ILogger<AdministrationController> logger, 
+            IAdministrationService administrationService, 
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _logger = logger;
             _administrationService = administrationService;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         [HttpPost]
@@ -52,12 +62,47 @@ namespace OneCap.Api.Controllers
         [Route("roles")]
         public  IActionResult GetRoles(CancellationToken ct)
         {
-            var Roles = _administrationService.GetRolesAsync(ct);
+            var Roles = _administrationService.GetRoles(ct);
 
             if (Roles == null)
                 return NotFound();
 
             return Ok(Roles);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageUserClaims(string userId, CancellationToken ct)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var existingUserClaims = await _userManager.GetClaimsAsync(user);
+
+            var model = new UserClaimsDto()
+            {
+                UserId = userId
+            };
+
+            foreach (Claim claim in ClaimStore.AllClaims)
+            {
+                UserClaimDto userClaim = new UserClaimDto()
+                {
+                    ClaimType = claim.Type
+                };
+
+                if (existingUserClaims.Any(c => c.Type == claim.Type))
+                {
+                    userClaim.IsSelected = true;
+                }
+
+                model.Claims.Add(userClaim);
+            }
+
+            return Ok(model);
         }
     }
 }

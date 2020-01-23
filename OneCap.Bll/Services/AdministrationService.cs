@@ -45,7 +45,7 @@ namespace OneCap.Bll.Services
             return _mapper.Map<RoleDto>(IdentityRole);
         }
 
-        public List<RoleDto> GetRolesAsync(CancellationToken ct)
+        public List<RoleDto> GetRoles(CancellationToken ct)
         {
             var IdentityRoles = _roleManager.Roles;
 

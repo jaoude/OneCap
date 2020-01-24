@@ -66,7 +66,7 @@ namespace OneCap.Api
                 c.SwaggerDoc("v1", new OpenApiInfo 
                 { 
                     Version = "V1",
-                    Title = "One Cap Server",
+                    Title = "Université Saint-Joseph de Beyrouth - One Cap Server",
                     Description = "The university Web API for handling students registrations",
                     TermsOfService = new Uri("https://www.facebook.com/usj.edu.lb/videos/890474227787534/"),
                     Contact = new OpenApiContact

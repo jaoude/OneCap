@@ -63,7 +63,24 @@ namespace OneCap.Api
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo 
+                { 
+                    Version = "V1",
+                    Title = "One Cap Server",
+                    Description = "The university Web API for handling students registrations",
+                    TermsOfService = new Uri("https://www.facebook.com/usj.edu.lb/videos/890474227787534/"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "John Smith",
+                        Email = "John.Smit@email.com",
+                        Url = new Uri("https://twitter.com/usjliban?lang=en"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Use under USJ-LICX",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
             });
         }
 

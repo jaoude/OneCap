@@ -72,6 +72,7 @@ namespace OneCap.Api.Controllers
         public async Task<IActionResult> ManageUserClaims([FromBody] UserClaimsDto model, CancellationToken ct)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
+            // test ab#2
 
             if (user == null)
             {

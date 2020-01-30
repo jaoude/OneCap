@@ -1,8 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using OneCap.Bll.Dto.Request;
 using OneCap.Dal.Entities;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +32,7 @@ namespace OneCap.Api.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDto model, CancellationToken ct)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto model, CancellationToken ct)
         {
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -49,14 +56,60 @@ namespace OneCap.Api.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginUserDto model, CancellationToken ct)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto model, CancellationToken ct)
         {
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+                if (result.Succeeded)
+                {
+                    var userClaims = await _userManager.GetClaimsAsync(user);
+                    var userRoles = await _userManager.GetRolesAsync(user); 
+                    return Token(user, userClaims, userRoles);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
 
-            if (result.Succeeded)
-                return Ok();
-            
-            return BadRequest(result);
+            return BadRequest();
+        }
+
+        private IActionResult Token(ApplicationUser user, IList<Claim> userClaims, IList<string> userRoles)
+        {
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Api.Models.OneCapJwtConstants.Key));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>()
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+            };
+
+            claims.AddRange(userClaims);
+            userRoles.Add("Admin");
+            foreach (string role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var token = new JwtSecurityToken(
+                Api.Models.OneCapJwtConstants.Issuer,
+                Api.Models.OneCapJwtConstants.Audience,
+                claims,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: creds
+            );
+
+            var results = new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            };
+
+            return new CreatedResult("", results);
         }
     }
 }

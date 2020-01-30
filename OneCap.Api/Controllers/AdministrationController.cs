@@ -24,8 +24,8 @@ namespace OneCap.Api.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdministrationController(ILogger<AdministrationController> logger, 
-            IAdministrationService administrationService, 
+        public AdministrationController(ILogger<AdministrationController> logger,
+            IAdministrationService administrationService,
             UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _logger = logger;
@@ -37,11 +37,21 @@ namespace OneCap.Api.Controllers
         [HttpPost("roles")]
         public async Task<IActionResult> CreateRole([FromBody] CreateRoleDto model, CancellationToken ct)
         {
-            RoleDto roleToRetun = null;
-            var result = await _administrationService.CreateRoleAsync(model, roleToRetun, ct);
+            var result = await _roleManager.CreateAsync(new IdentityRole() { Name = model.RoleName });
 
             if (result.Succeeded)
-                return CreatedAtRoute("GetRole", new { id = roleToRetun.Id }, roleToRetun);
+            {
+                var roleToReturn = _roleManager.Roles.FirstOrDefault(c => c.Name == model.RoleName);
+                RoleDto roleToRetunDto = new RoleDto() 
+                { 
+                    Id = roleToReturn.Id, 
+                    Name = roleToReturn.Name, 
+                    NormalizedName = roleToReturn.NormalizedName, 
+                    ConcurrencyStamp = roleToReturn.ConcurrencyStamp 
+                };
+
+                return CreatedAtRoute("GetRole", new { id = roleToRetunDto.Id }, roleToRetunDto);
+            }
 
             return BadRequest(result.Errors);
         }
@@ -58,7 +68,7 @@ namespace OneCap.Api.Controllers
         }
 
         [HttpGet("roles")]
-        public  IActionResult GetRoles(CancellationToken ct)
+        public IActionResult GetRoles(CancellationToken ct)
         {
             var Roles = _administrationService.GetRoles(ct);
 

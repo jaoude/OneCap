@@ -20,6 +20,9 @@ using OneCap.Bll.Helpers;
 using Microsoft.AspNetCore.Identity;
 using OneCap.Dal.Entities;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using OneCap.Api.Models;
+using System.Text;
 
 namespace OneCap.Api
 {
@@ -57,6 +60,18 @@ namespace OneCap.Api
 
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
+
+            services.AddAuthentication()
+              .AddCookie(cfg => cfg.SlidingExpiration = true)
+              .AddJwtBearer(cfg =>
+              {
+                  cfg.TokenValidationParameters = new TokenValidationParameters()
+                  {
+                      ValidIssuer = OneCapJwtConstants.Issuer,
+                      ValidAudience = OneCapJwtConstants.Audience,
+                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(OneCapJwtConstants.Key))
+                  };
+              });
 
             services.AddControllers();
 

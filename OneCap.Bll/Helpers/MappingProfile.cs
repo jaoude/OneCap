@@ -10,7 +10,7 @@ namespace OneCap.Bll.Helpers
     {
         public MappingProfile()
         {
-            CreateMap<Course, RoleDto>();
+            CreateMap<Course, CourseDto>();
             CreateMap<CreateCourseDto, Course>();
 
             CreateMap<CreateRoleDto, IdentityRole>();

@@ -23,6 +23,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using OneCap.Api.Models;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace OneCap.Api
 {
@@ -42,8 +43,10 @@ namespace OneCap.Api
                 option => option.UseSqlServer(Configuration.GetConnectionString("OneCapConnectionString")
             ));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<OneCapDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            { 
+                options.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<OneCapDbContext>();
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ICourseRepository, CourseRepository>();
@@ -56,6 +59,12 @@ namespace OneCap.Api
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new MappingProfile());
+            });
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
             IMapper mapper = mappingConfig.CreateMapper();

@@ -37,7 +37,8 @@ namespace OneCap.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult> GetCourses(CancellationToken ct)
         {
             var coursesDto = await _courseService.GetCoursesAsync(ct);

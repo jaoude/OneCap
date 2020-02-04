@@ -47,7 +47,6 @@ namespace OneCap.Bll.Services
             try
             {
                 courseEntity = _mapper.Map<Course>(createCourseDto);
-
                 await _uow.Courses.AddAsync(courseEntity, ct);
                 await _uow.SaveChangesAsync(ct);
             }
@@ -57,6 +56,30 @@ namespace OneCap.Bll.Services
             }
 
             return _mapper.Map<CourseDto>(courseEntity);
+        }
+
+        public async Task UpdateCourseAsync(int id, UpdateCourseDto updateCourseDto, CancellationToken ct)
+        {
+            Course courseEntity = null;
+
+            try
+            {
+                var courseExistingEntity = await _uow.Courses.GetAsync(id, ct);
+                if (courseExistingEntity != null)
+                {
+                    courseEntity = _mapper.Map<Course>(updateCourseDto);
+                    ///_uow.Courses.Update(courseEntity, id, ct);
+                    await _uow.SaveChangesAsync(ct);
+                }
+                else
+                {
+                    throw new KeyNotFoundException();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace OneCap.Dal.Migrations
 {
-    public partial class Initial_Setup : Migration
+    public partial class Add_Course_Students : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

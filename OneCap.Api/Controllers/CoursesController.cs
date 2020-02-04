@@ -29,16 +29,16 @@ namespace OneCap.Api.Controllers
         public async Task<ActionResult> GetCourse(int id, CancellationToken ct)
         {
             var courseDto = await _courseService.GetCourseByIdAsync(id, ct);
-            
+
             if (courseDto == null)
                 return NotFound();
-            
+
             return Ok(courseDto);
         }
 
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer")]
-        [Authorize(Roles = "User")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        //[Authorize(Roles = "User")]
         public async Task<ActionResult> GetCourses(CancellationToken ct)
         {
             var coursesDto = await _courseService.GetCoursesAsync(ct);
@@ -49,7 +49,7 @@ namespace OneCap.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<ActionResult> CreateCourse([FromBody] CreateCourseDto createCourseDto, CancellationToken ct)
         {
             if (createCourseDto == null)
@@ -62,6 +62,18 @@ namespace OneCap.Api.Controllers
 
 
             return CreatedAtRoute("GetCourse", new { id = courseToReturn.Id }, courseToReturn);
+        }
+
+        [HttpPut("{id}")]
+        //[Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<ActionResult> UpdateCourse(int id, [FromBody] UpdateCourseDto updateCourseDto, CancellationToken ct)
+        {
+            if (updateCourseDto == null)
+                return BadRequest();
+
+            await _courseService.UpdateCourseAsync(id, updateCourseDto, ct);
+
+            return NoContent();
         }
     }
 }

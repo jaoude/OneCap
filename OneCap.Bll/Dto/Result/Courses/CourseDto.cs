@@ -9,5 +9,7 @@ namespace OneCap.Bll.Dto.Result
         public int Id { get; set; }
         public string Name { get; set; }
         public int Credits { get; set; }
+
+        public byte[] RowVersion { get; set; }
     }
 }

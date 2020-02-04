@@ -7,7 +7,7 @@ using System.Text;
 namespace OneCap.Dal.Entities
 {
     [Table("Course")]
-    public class Course
+    public class Course : OneCapBaseEntity, IHasConcurrency//, IHasFullAudit
     {
         [Key]
         public int Id { get; set; }

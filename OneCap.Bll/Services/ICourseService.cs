@@ -14,5 +14,6 @@ namespace OneCap.Bll.Services
         Task<CourseDto> GetCourseByIdAsync(int id, CancellationToken ct);
         Task<IEnumerable<CourseDto>> GetCoursesAsync(CancellationToken ct);
         Task<CourseDto> CreateCourseAsync(CreateCourseDto creatCourseDto, CancellationToken ct);
+        Task UpdateCourseAsync(int id, UpdateCourseDto updateCourseDto, CancellationToken ct);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace OneCap.Dal.Migrations
 {
-    public partial class AddingIdentity : Migration
+    public partial class Initial_Setup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

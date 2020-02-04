@@ -12,6 +12,7 @@ namespace OneCap.Bll.Helpers
         {
             CreateMap<Course, CourseDto>();
             CreateMap<CreateCourseDto, Course>();
+            CreateMap<UpdateCourseDto, Course>();
 
             CreateMap<CreateRoleDto, IdentityRole>();
             CreateMap<IdentityRole, RoleDto>();

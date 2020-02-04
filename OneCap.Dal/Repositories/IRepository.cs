@@ -31,6 +31,6 @@ namespace OneCap.Dal.Repositories
         void Save();
         Task<int> SaveAsync(CancellationToken ct);
         TEntity Update(TEntity t, object key);
-        Task<TEntity> UpdateAsync(TEntity t, object key, CancellationToken ct);
+        Task<TEntity> UpdateAsync(TEntity t, object key, CancellationToken ct, byte[] rowVersion = null);
     }
 }

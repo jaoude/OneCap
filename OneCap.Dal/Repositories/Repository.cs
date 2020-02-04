@@ -99,14 +99,17 @@ namespace OneCap.Dal.Repositories
             return exist;
         }
 
-        public virtual async Task<T> UpdateAsync(T t, object key, CancellationToken ct)
+        public virtual async Task<T> UpdateAsync(T t, object key, CancellationToken ct, byte[] rowVersion = null)
         {
             if (t == null)
                 return null;
             T exist = await _db.Set<T>().FindAsync(key);
             if (exist != null)
             {
+                if(rowVersion != null)
+                    _db.Entry(exist).OriginalValues["RowVersion"] = rowVersion;
                 _db.Entry(exist).CurrentValues.SetValues(t);
+             
                 await _db.SaveChangesAsync(ct);
             }
             return exist;

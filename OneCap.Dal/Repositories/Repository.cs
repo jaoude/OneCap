@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OneCap.Dal.Entities;
+using OneCap.Dal.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,51 +19,74 @@ namespace OneCap.Dal.Repositories
         {
             _db = db;
         }
-        public IQueryable<T> GetAll()
+        public void Insert(T item)
+        {
+            _db.Set<T>().Add(item);
+        }
+
+        public T Update(T item, int id)
+        {
+            if (item == null)
+                return null;
+
+            T existing = _db.Set<T>().Find(id);
+
+            if (existing != null)
+            {
+                _db.Entry(existing).CurrentValues.SetValues(item);
+            }
+            return existing;
+        }
+        public async Task<T> UpdateAsync(T item, int id, CancellationToken ct)
+        {
+            if (item == null)
+                return null;
+
+            T existing = await _db.Set<T>().FindAsync(new object[] { id }, ct);
+            
+            if (existing != null)
+            {
+                if (item is IHasConcurrency)
+                    _db.Entry(existing).OriginalValues["RowVersion"] = ((IHasConcurrency)item).RowVersion;
+            
+                _db.Entry(existing).CurrentValues.SetValues(item);
+            }
+            return existing;
+        }
+
+        public void Delete(T item)
+        {
+            _db.Set<T>().Remove(item);
+        }
+
+        public IQueryable<T> Select()
         {
             return _db.Set<T>();
         }
 
-        public virtual async Task<ICollection<T>> GetAllAsync(CancellationToken ct)
-        {
-
-            return await _db.Set<T>().ToListAsync(ct);
-        }
-
-        public virtual T Get(int id)
+        public T Get(int id)
         {
             return _db.Set<T>().Find(id);
         }
 
-        public virtual async Task<T> GetAsync(int id, CancellationToken ct)
+        public async Task<T> GetAsync(int id, CancellationToken ct)
         {
             return await _db.Set<T>().FindAsync(new object[] { id }, ct);
         }
 
-        public virtual T Add(T t)
+        public async Task<ICollection<T>> GetAllAsync(CancellationToken ct)
         {
-
-            _db.Set<T>().Add(t);
-            _db.SaveChanges();
-            return t;
+            return await _db.Set<T>().ToListAsync(ct);
         }
 
-        public virtual async Task<T> AddAsync(T t, CancellationToken ct)
-        {
-            _db.Set<T>().Add(t);
-            await _db.SaveChangesAsync(ct);
-            return t;
-
-        }
-
-        public virtual T Find(Expression<Func<T, bool>> match)
+        public T Find(Expression<Func<T, bool>> match)
         {
             return _db.Set<T>().SingleOrDefault(match);
         }
 
-        public virtual async Task<T> FindAsync(Expression<Func<T, bool>> match, CancellationToken ct)
+        public async Task<T> FindAsync(Expression<Func<T, bool>> match, CancellationToken ct)
         {
-            return await _db.Set<T>().SingleOrDefaultAsync(match, ct);
+            return await _db.Set<T>().SingleOrDefaultAsync(match);
         }
 
         public ICollection<T> FindAll(Expression<Func<T, bool>> match)
@@ -71,45 +96,7 @@ namespace OneCap.Dal.Repositories
 
         public async Task<ICollection<T>> FindAllAsync(Expression<Func<T, bool>> match, CancellationToken ct)
         {
-            return await _db.Set<T>().Where(match).ToListAsync(ct);
-        }
-
-        public virtual void Delete(T entity)
-        {
-            _db.Set<T>().Remove(entity);
-            _db.SaveChanges();
-        }
-
-        public virtual async Task<int> DeleteAsync(T entity, CancellationToken ct)
-        {
-            _db.Set<T>().Remove(entity);
-            return await _db.SaveChangesAsync(ct);
-        }
-
-        public virtual T Update(T t, object key)
-        {
-            if (t == null)
-                return null;
-            T exist = _db.Set<T>().Find(key);
-            if (exist != null)
-            {
-                _db.Entry(exist).CurrentValues.SetValues(t);
-                _db.SaveChanges();
-            }
-            return exist;
-        }
-
-        public virtual async Task<T> UpdateAsync(T t, object key, CancellationToken ct)
-        {
-            if (t == null)
-                return null;
-            T exist = await _db.Set<T>().FindAsync(key);
-            if (exist != null)
-            {
-                _db.Entry(exist).CurrentValues.SetValues(t);
-                await _db.SaveChangesAsync(ct);
-            }
-            return exist;
+            return await _db.Set<T>().Where(match).ToListAsync();
         }
 
         public int Count()
@@ -117,63 +104,9 @@ namespace OneCap.Dal.Repositories
             return _db.Set<T>().Count();
         }
 
-        public async Task<int> CountAsync(CancellationToken ct)
+        public Task<int> CountAsync(CancellationToken ct)
         {
-            return await _db.Set<T>().CountAsync(ct);
-        }
-
-        public virtual void Save()
-        {
-
-            _db.SaveChanges();
-        }
-
-        public async virtual Task<int> SaveAsync(CancellationToken ct)
-        {
-            return await _db.SaveChangesAsync(ct);
-        }
-
-        public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
-        {
-            IQueryable<T> query = _db.Set<T>().Where(predicate);
-            return query;
-        }
-
-        public virtual async Task<ICollection<T>> FindByAsync(Expression<Func<T, bool>> predicate, CancellationToken ct)
-        {
-            return await _db.Set<T>().Where(predicate).ToListAsync(ct);
-        }
-
-        public IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
-        {
-
-            IQueryable<T> queryable = GetAll();
-            foreach (Expression<Func<T, object>> includeProperty in includeProperties)
-            {
-
-                queryable = queryable.Include<T, object>(includeProperty);
-            }
-
-            return queryable;
-        }
-
-        private bool disposed = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    _db.Dispose();
-                }
-                this.disposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            return _db.Set<T>().CountAsync();
         }
     }
 }

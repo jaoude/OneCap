@@ -47,7 +47,7 @@ namespace OneCap.Bll.Services
             try
             {
                 courseEntity = _mapper.Map<Course>(createCourseDto);
-                await _uow.Courses.AddAsync(courseEntity, ct);
+                _uow.Courses.Insert(courseEntity);
                 await _uow.SaveChangesAsync(ct);
             }
             catch (Exception ex)

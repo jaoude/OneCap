@@ -103,7 +103,7 @@ namespace OneCap.Dal.Repositories
         {
             if (t == null)
                 return null;
-            T exist = await _db.Set<T>().FindAsync(key, ct);
+            T exist = await _db.Set<T>().FindAsync(key);
             if (exist != null)
             {
                 _db.Entry(exist).CurrentValues.SetValues(t);

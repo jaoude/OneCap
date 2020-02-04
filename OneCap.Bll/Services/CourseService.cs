@@ -68,7 +68,8 @@ namespace OneCap.Bll.Services
                 if (courseExistingEntity != null)
                 {
                     courseEntity = _mapper.Map<Course>(updateCourseDto);
-                    ///_uow.Courses.Update(courseEntity, id, ct);
+                    courseEntity.Id = id;
+                    await _uow.Courses.UpdateAsync(courseEntity, id, ct);
                     await _uow.SaveChangesAsync(ct);
                 }
                 else

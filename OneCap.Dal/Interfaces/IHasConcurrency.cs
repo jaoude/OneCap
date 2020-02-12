@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace OneCap.Dal.Entities
+namespace OneCap.Dal.Interfaces
 {
     public interface IHasConcurrency
     {

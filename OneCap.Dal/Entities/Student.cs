@@ -7,11 +7,8 @@ using System.Text;
 namespace OneCap.Dal.Entities
 {
     [Table("Student")]
-    public class Student
+    public class Student : OneCapBaseDataEntity
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }

@@ -16,5 +16,12 @@ namespace OneCap.Dal.Entities
 
         [Required]
         public int Credits { get; set; }
+
+        [Required]
+        public string TeacherName { get; set; }
+
+
+        public string TeacherFamilyName { get; set; }
+
     }
 }
